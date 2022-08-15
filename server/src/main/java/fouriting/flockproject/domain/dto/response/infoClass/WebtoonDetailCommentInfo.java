@@ -3,10 +3,12 @@ package fouriting.flockproject.domain.dto.response.infoClass;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @AllArgsConstructor
-public class WebtoonInfo {
+public class WebtoonDetailCommentInfo {
     private String name;
-    private String author;
-    private String image;
+    private String contents;
+    private LocalDateTime createTime;
 }

@@ -1,11 +1,11 @@
 package fouriting.flockproject.domain;
 
+import fouriting.flockproject.domain.enumClass.Authority;
+import fouriting.flockproject.domain.enumClass.Title;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -29,10 +29,14 @@ public class Member {
     private String passwd;
     @Enumerated(EnumType.STRING)
     private Title title;
-    @Embedded
-    private StarScore myScore;
+
+    // Foreign Table
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> myComments = new ArrayList<>();
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StarLike> myStars = new ArrayList<>();
+
+    // Spring Security
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
@@ -41,5 +45,10 @@ public class Member {
         this.loginId = loginId;
         this.nickname = nickname;
         this.passwd = passwd;
+    }
+
+    public void updateTitle(){
+        if(this.getMyComments().size() > 10)
+            this.title = Title.박찬호;
     }
 }

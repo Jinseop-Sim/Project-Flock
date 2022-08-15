@@ -1,18 +1,18 @@
 package fouriting.flockproject.repository;
 
-import fouriting.flockproject.domain.Genre;
+import fouriting.flockproject.domain.enumClass.Genre;
 import fouriting.flockproject.domain.Webtoon;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class WebtoonRepository {
-    @PersistenceContext
-    EntityManager em;
+    private final EntityManager em;
 
     public List<Webtoon> findByGenre(Genre genre){
         List<Webtoon> webtoons = em.createQuery("SELECT w FROM Webtoon w WHERE w.genre =: genre", Webtoon.class)
@@ -31,7 +31,8 @@ public class WebtoonRepository {
     }
 
     public Optional<Webtoon> findById(Long id){
-        List webtoons = em.createQuery("SELECT w FROM Webtoon w WHERE w.id =: id")
+        List webtoons = em.createQuery("SELECT w FROM Webtoon w " +
+                "join fetch w.comments " + "WHERE w.id =: id")
                 .setParameter("id", id)
                 .getResultList();
 

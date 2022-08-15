@@ -57,7 +57,7 @@ public class AuthController {
             @ApiResponse(code = 404, message = "NOT FOUND")
     })
     @PostMapping("/reissue")
-    public ResponseEntity<MemberTokenDto> reissue(TokenRequestDto tokenRequestDto){
+    public ResponseEntity<MemberTokenDto> reissue(@RequestBody TokenRequestDto tokenRequestDto){
         return new ResponseEntity<>(authService.reissue(tokenRequestDto), HttpStatus.OK);
     }
 }
