@@ -1,11 +1,16 @@
 package fouriting.flockproject.controller;
 
-import fouriting.flockproject.domain.Genre;
+import fouriting.flockproject.domain.dto.request.WebtoonRequestDto;
+import fouriting.flockproject.domain.dto.response.StarResponseDto;
+import fouriting.flockproject.domain.enumClass.Genre;
+import fouriting.flockproject.domain.dto.request.AddStarRequestDto;
 import fouriting.flockproject.domain.dto.request.CommentRequestDto;
 import fouriting.flockproject.domain.dto.response.CommentResponseDto;
-import fouriting.flockproject.domain.dto.response.infoClass.WebtoonInfo;
+import fouriting.flockproject.domain.dto.response.infoClass.WebtoonDetailResponseDto;
 import fouriting.flockproject.domain.dto.response.WebtoonSearchDto;
 import fouriting.flockproject.service.WebtoonService;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,7 +47,31 @@ public class WebtoonController {
             "\n Webtoon의 ID 값을 경로에 넘겨주시면 됩니다." +
             "\n ex) domain.com/webtoons/1")
     @GetMapping("/{webtoonId}")
-    public ResponseEntity<WebtoonInfo> webtoonDetail(@PathVariable Long webtoonId){
+    public ResponseEntity<WebtoonDetailResponseDto> webtoonDetail(@PathVariable Long webtoonId){
         return new ResponseEntity<>(webtoonService.showWebtoonDetail(webtoonId), HttpStatus.OK);
+    }
+
+    @Operation(summary = "웹툰 별점 등록", description = "웹툰 별점 등록 컨트롤러입니다."+
+            "\n ### 요청 변수 " +
+            "\n Webtoon의 ID 값을 경로에 넘기고, 별점 값이 JSON 형태로 넘어와야 합니다." +
+            "\n ex) domain.com/webtoons/1")
+    @PostMapping("/{webtoonId}/star")
+    public ResponseEntity<StarResponseDto> postStarToWebtoon(@PathVariable Long webtoonId,
+                                                             @RequestBody AddStarRequestDto addStarRequestDto){
+        return new ResponseEntity<>(webtoonService.addStarToWebtoon(webtoonId, addStarRequestDto), HttpStatus.OK);
+    }
+
+    @Operation(summary = "검색 기능", description = "검색 기능 요청 Controller입니다."+
+            "\n ### 요청 변수 : JSON형태로 String Webtoon Title.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK!!"),
+            @ApiResponse(code = 400, message = "BAD REQUEST!!"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "NOT FOUND")
+    })
+    @PostMapping("/search")
+    public ResponseEntity<WebtoonSearchDto> searchWebtoon(@RequestBody WebtoonRequestDto webtoonRequestDto){
+        return new ResponseEntity<>(webtoonService.searchWebtoon(webtoonRequestDto), HttpStatus.OK);
     }
 }

@@ -59,7 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/auth/**", "/hello",
-                        "/swagger-resources/**", "/search", "/webtoons/**").permitAll()
+                        "/swagger-resources/**", "/search", "/webtoons",
+                        "/webtoons/{\\d+}").permitAll()
                 .anyRequest().authenticated()
                 // auth로 시작하는 경로만 접근허가. 나머진 모두 권한 획득 후 접근.
                 .and()

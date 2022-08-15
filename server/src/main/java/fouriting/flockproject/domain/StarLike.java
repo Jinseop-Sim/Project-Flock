@@ -1,35 +1,37 @@
 package fouriting.flockproject.domain;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Comment {
+public class StarLike {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "COMMENT_ID")
+    @Column(name = "STAR_ID")
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
+    private Double score;
+
+    // Foreign Key
+    @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "WEBTOON_ID")
     private Webtoon webtoon;
-    private String author;
-    private LocalDateTime postTime;
-    @Lob
-    private String contents;
 
-    public void addToMemberAndWebtoon(){
-        member.getMyComments().add(this);
-        webtoon.getComments().add(this);
+    public void postStar(){
+        member.getMyStars().add(this);
+        webtoon.getStars().add(this);
+    }
+
+    public void updateStar(Double score){
+        this.score = score;
     }
 }

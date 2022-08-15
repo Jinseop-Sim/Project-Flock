@@ -45,18 +45,4 @@ public class MemberController {
     public ResponseEntity<MyPageResponseDto> myPage(HttpServletRequest request){
         return new ResponseEntity<>(memberService.showMyPage(), HttpStatus.OK);
     }
-
-    @Operation(summary = "검색 기능", description = "검색 기능 요청 Controller입니다."+
-    "\n ### 요청 변수 : JSON형태로 String Webtoon Title.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "OK!!"),
-            @ApiResponse(code = 400, message = "BAD REQUEST!!"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "NOT FOUND")
-    })
-    @PostMapping("/search")
-    public ResponseEntity<WebtoonSearchDto> searchWebtoon(@RequestBody WebtoonRequestDto webtoonRequestDto){
-        return new ResponseEntity<>(memberService.searchWebtoon(webtoonRequestDto.getName()), HttpStatus.OK);
-    }
 }

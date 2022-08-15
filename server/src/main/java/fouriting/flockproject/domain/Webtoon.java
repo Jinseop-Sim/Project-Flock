@@ -1,5 +1,7 @@
 package fouriting.flockproject.domain;
 
+import fouriting.flockproject.domain.enumClass.Genre;
+import fouriting.flockproject.domain.enumClass.Platform;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,7 +25,25 @@ public class Webtoon {
     private Platform platform;
     @Enumerated(EnumType.STRING)
     private Genre genre;
-    private StarScore starScore;
+    private Double starAvg;
+    private Double starSum;
+
+    // Foreign Table
+    @OneToMany(mappedBy = "webtoon")
+    private List<StarLike> stars = new ArrayList<>();
     @OneToMany(mappedBy = "webtoon")
     private List<Comment> comments = new ArrayList<>();
+
+    public void addStar(Double score){
+        this.starSum += score;
+    }
+
+    public void subStar(Double target){
+        this.starSum -= target;
+    }
+
+    public void calcStar(){
+        if(this.starSum == 0) this.starAvg = 0.0;
+        else this.starAvg = starSum / stars.size();
+    }
 }

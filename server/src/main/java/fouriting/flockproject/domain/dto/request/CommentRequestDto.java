@@ -15,10 +15,11 @@ import java.time.LocalDateTime;
 public class CommentRequestDto {
     private String contents;
 
-    public Comment sendComment(Member member, Webtoon webtoon){
+    public Comment sendComment(Member member, String author, Webtoon webtoon){
         return Comment.builder()
                 .member(member)
                 .webtoon(webtoon)
+                .author(author)
                 .contents(contents)
                 .postTime(LocalDateTime.now())
                 .build();

@@ -1,8 +1,8 @@
 package fouriting.flockproject.domain.dto.request;
 
-import fouriting.flockproject.domain.Authority;
+import fouriting.flockproject.domain.enumClass.Authority;
 import fouriting.flockproject.domain.Member;
-import fouriting.flockproject.domain.Title;
+import fouriting.flockproject.domain.enumClass.Title;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
