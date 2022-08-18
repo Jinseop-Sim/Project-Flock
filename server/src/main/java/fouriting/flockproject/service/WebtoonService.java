@@ -21,12 +21,11 @@ import fouriting.flockproject.repository.StarRepository;
 import fouriting.flockproject.repository.WebtoonRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import static java.lang.Math.abs;
 
 @Service
@@ -40,7 +39,7 @@ public class WebtoonService {
     @Transactional
     public CommentResponseDto addComment(Long webtoonId, CommentRequestDto commentRequestDto){
         Member findedMember = memberRepository.findById(SecurityUtil.getCurrnetMemberId()).get();
-        Webtoon findedWebtoon = webtoonRepository.findById(webtoonId).get();
+        Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
         Comment comment = commentRequestDto.sendComment(findedMember, findedMember.getNickname(), findedWebtoon);
         comment.addToMemberAndWebtoon();
         commentRepository.save(comment);
@@ -54,25 +53,25 @@ public class WebtoonService {
         List<WebtoonInfo> webtoonInfos = new ArrayList<>();
         List<Webtoon> findedWebtoons = webtoonRepository.findByGenre(genre);
         for (Webtoon findedWebtoon : findedWebtoons) {
-            webtoonInfos.add(new WebtoonInfo(findedWebtoon.getName(), findedWebtoon.getAuthor(), findedWebtoon.getImage()));
+            webtoonInfos.add(new WebtoonInfo(findedWebtoon.getId(), findedWebtoon.getName(), findedWebtoon.getAuthor(), findedWebtoon.getImage()));
         }
 
         return new WebtoonSearchDto(webtoonInfos);
     }
 
     @Transactional
-    public WebtoonDetailResponseDto showWebtoonDetail(Long webtoonId){
+    public WebtoonDetailResponseDto showWebtoonDetail(Long webtoonId, HttpServletRequest request){
         Double tempStar = 0.0;
-        Optional<StarLike> findedStar = starRepository.findByMemberId(SecurityUtil.getCurrnetMemberId());
+        if(request.getHeader("Authorization") != null) {
+            Optional<StarLike> findedStar = starRepository.findByMemberId(SecurityUtil.getCurrnetMemberId(), webtoonId);
 
-        if(findedStar.isPresent()) {
-            if(findedStar.get().getWebtoon().getId().equals(webtoonId)) {
-                tempStar = findedStar.get().getScore();
+            if (findedStar.isPresent()) {
+                    tempStar = findedStar.get().getScore();
             }
         }
 
         List<WebtoonDetailCommentInfo> commentInfos = new ArrayList<>();
-        Webtoon findedWebtoon = webtoonRepository.findById(webtoonId).get();
+        Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
 
         for (Comment comment : findedWebtoon.getComments()) {
             commentInfos.add(new WebtoonDetailCommentInfo(comment.getAuthor(),
@@ -91,22 +90,23 @@ public class WebtoonService {
     @Transactional
     public StarResponseDto addStarToWebtoon(Long webtoonId, AddStarRequestDto addStarRequestDto){
         Member findedMember = memberRepository.findById(SecurityUtil.getCurrnetMemberId()).get();
-        Optional<StarLike> findedStar = starRepository.findByMemberId(findedMember.getId());
+        Optional<StarLike> findedStar = starRepository.findByMemberId(findedMember.getId(), webtoonId);
 
         if(findedStar.isPresent()) {
-            Webtoon findedWebtoon = webtoonRepository.findById(webtoonId).get();
+            Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
             findedWebtoon.subStar(abs(findedStar.get().getScore() - addStarRequestDto.getScore()));
             findedStar.get().updateStar(addStarRequestDto.getScore());
         }
 
         else {
-            Webtoon findedWebtoon = webtoonRepository.findById(webtoonId).get();
+            Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
             StarLike starLike = addStarRequestDto.sendStarLike(findedMember, findedWebtoon);
             starLike.postStar(); findedWebtoon.addStar(addStarRequestDto.getScore());
             starRepository.save(starLike);
 
             return new StarResponseDto(starLike.getScore());
         }
+
         return new StarResponseDto(findedStar.get().getScore());
     }
 
@@ -116,7 +116,9 @@ public class WebtoonService {
         // 검색한 제목이 들어가는 웹툰 List를 받아온다.
         List<Webtoon> webtoonList = webtoonRepository.findByName(webtoonRequestDto.getName());
         for (Webtoon webtoon : webtoonList) {
-            webtoonInfoList.add(new WebtoonInfo(webtoon.getName(),
+            webtoonInfoList.add(new WebtoonInfo(
+                    webtoon.getId(),
+                    webtoon.getName(),
                     webtoon.getAuthor(),
                     webtoon.getImage()));
         }

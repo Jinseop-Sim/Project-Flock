@@ -8,6 +8,10 @@ import fouriting.flockproject.domain.dto.request.TokenRequestDto;
 import fouriting.flockproject.domain.dto.response.MemberResponseDto;
 import fouriting.flockproject.domain.dto.request.MemberSignUpDto;
 import fouriting.flockproject.domain.dto.response.MemberTokenDto;
+import fouriting.flockproject.exception.ErrorCode;
+import fouriting.flockproject.exception.custom.IdDuplicateException;
+import fouriting.flockproject.exception.custom.IdNotExistException;
+import fouriting.flockproject.exception.custom.PasswdNotMatchException;
 import fouriting.flockproject.repository.MemberRepository;
 import fouriting.flockproject.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +36,7 @@ public class AuthService {
     @Transactional
     public MemberResponseDto signUp(MemberSignUpDto memberSignUpDto){
         if(memberRepository.findByLoginId(memberSignUpDto.getLoginId()).isPresent())
-            throw new IllegalArgumentException("이미 가입되어 있는 유저입니다.");
+            throw new IdDuplicateException("이미 존재하는 ID입니다.", ErrorCode.ID_DUPLICATION);
 
         Member member = memberSignUpDto.sendMember(passwordEncoder);
         return new MemberResponseDto().memberResponse(memberRepository.save(member));
@@ -39,6 +44,12 @@ public class AuthService {
 
     @Transactional
     public MemberTokenDto logIn(MemberLogInDto memberLogInDto){
+        Optional<Member> findedMember = memberRepository.findByLoginId(memberLogInDto.getLoginId());
+
+        findedMember.orElseThrow(() -> new IdNotExistException("존재하지 않는 User입니다.", ErrorCode.ID_NOT_EXIST));
+        if(!passwordEncoder.matches(memberLogInDto.getPasswd(), findedMember.get().getPasswd()))
+            throw new PasswdNotMatchException("Password가 일치하지 않습니다!", ErrorCode.PW_NOT_MATCH);
+
         // Login Id / Pw를 기반으로 권한 Token 생성
         UsernamePasswordAuthenticationToken authenticationToken = memberLogInDto.sendAuthentication();
 

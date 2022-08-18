@@ -30,12 +30,11 @@ public class WebtoonRepository {
         return webtoons;
     }
 
-    public Optional<Webtoon> findById(Long id){
-        List webtoons = em.createQuery("SELECT w FROM Webtoon w " +
-                "join fetch w.comments " + "WHERE w.id =: id")
+    public Webtoon findById(Long id){
+        Webtoon webtoons = em.createQuery("SELECT w FROM Webtoon w WHERE w.id =: id", Webtoon.class)
                 .setParameter("id", id)
-                .getResultList();
+                .getSingleResult();
 
-        return webtoons.stream().findAny();
+        return webtoons;
     }
 }

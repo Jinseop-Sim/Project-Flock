@@ -18,7 +18,7 @@ public class MemberSignUpDto {
     private String loginId;
     @NotBlank(message = "닉네임은 필수 값입니다.")
     private String nickname;
-    @NotBlank(message = "이름은 필수 값입니다.")
+    @NotBlank(message = "비밀번호는 필수 값입니다.")
     private String passwd;
 
     public Member sendMember(PasswordEncoder passwordEncoder){

@@ -1,6 +1,7 @@
 package fouriting.flockproject.config.jwt;
 
 import fouriting.flockproject.domain.dto.response.MemberTokenDto;
+import fouriting.flockproject.exception.ErrorCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
@@ -32,7 +34,7 @@ public class AuthController {
             @ApiResponse(code = 404, message = "NOT FOUND")
     })
     @PostMapping("/login")
-    public ResponseEntity<MemberTokenDto> login(@RequestBody MemberLogInDto memberLogInDto){
+    public ResponseEntity<MemberTokenDto> login(@RequestBody @Valid MemberLogInDto memberLogInDto){
         return new ResponseEntity<>(authService.logIn(memberLogInDto), HttpStatus.OK);
     }
 
@@ -45,7 +47,7 @@ public class AuthController {
             @ApiResponse(code = 404, message = "NOT FOUND")
     })
     @PostMapping("/signup")
-    public ResponseEntity<MemberResponseDto> signup(@RequestBody MemberSignUpDto memberSignUpDto){
+    public ResponseEntity<MemberResponseDto> signup(@RequestBody @Valid MemberSignUpDto memberSignUpDto){
         return new ResponseEntity<>(authService.signUp(memberSignUpDto), HttpStatus.OK);
     }
 

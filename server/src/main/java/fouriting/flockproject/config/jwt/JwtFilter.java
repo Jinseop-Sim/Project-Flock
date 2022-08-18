@@ -1,5 +1,8 @@
 package fouriting.flockproject.config.jwt;
 
+import fouriting.flockproject.exception.ErrorCode;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,9 +30,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // Validation 단계.
         // 정상적인 토큰이면 해당 토큰으로 권한을 가져와 Context에 올린다.
-        if(StringUtils.hasText(jwtoken) && tokenProvider.validateToken(jwtoken)){
-            Authentication authentication = tokenProvider.getAuthentication(jwtoken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            if (StringUtils.hasText(jwtoken) && tokenProvider.validateToken(jwtoken)) {
+                Authentication authentication = tokenProvider.getAuthentication(jwtoken);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (SecurityException | MalformedJwtException e){
+            request.setAttribute("exception", ErrorCode.WRONG_TYPE_TOKEN.getErrorCode());
+        } catch (ExpiredJwtException e){
+            request.setAttribute("exception", ErrorCode.EXPIRED_JWT.getErrorCode());
         }
 
         filterChain.doFilter(request, response);
@@ -39,7 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // Header에서 Token꺼냄
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         // Header에 해당 Token이 존재하고, Bearer로 시작하는 토큰이면
-        // 앞 7자리를 추출해서 토큰 정보를 꺼내온다.
+        // 앞 7자리만 빼고 추출해서 토큰 정보를 꺼내온다.
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)){
             return bearerToken.substring(7);
         }
