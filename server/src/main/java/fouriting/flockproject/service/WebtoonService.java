@@ -92,17 +92,27 @@ public class WebtoonService {
         Member findedMember = memberRepository.findById(SecurityUtil.getCurrnetMemberId()).get();
         Optional<StarLike> findedStar = starRepository.findByMemberId(findedMember.getId(), webtoonId);
 
-        if(findedStar.isPresent()) {
+        if(findedStar.isPresent()) { // 이 때는, 이미 별점을 표시하고 업데이트 할 때.
             Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
+            // 내가 표시했던 별점이 5점이나 1점이면 빼야함.
+            if(findedStar.get().getScore() == 5) findedMember.subStarFive();
+            if(findedStar.get().getScore() == 1) findedMember.subStarOne();
+
             findedWebtoon.subStar(abs(findedStar.get().getScore() - addStarRequestDto.getScore()));
             findedStar.get().updateStar(addStarRequestDto.getScore());
+            // 내가 바꾸려는 별점이 5점이나 1점이면 추가.
+            if(addStarRequestDto.getScore() == 5) findedMember.addStarFive();
+            if(addStarRequestDto.getScore() == 1) findedMember.addStarOne();
         }
 
-        else {
+        else { // 아직 별점을 등록을 안했을 때
             Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
             StarLike starLike = addStarRequestDto.sendStarLike(findedMember, findedWebtoon);
             starLike.postStar(); findedWebtoon.addStar(addStarRequestDto.getScore());
             starRepository.save(starLike);
+            // 내가 바꾸려는 별점이 5점이나 1점이면 추가.
+            if(addStarRequestDto.getScore() == 5) findedMember.addStarFive();
+            if(addStarRequestDto.getScore() == 1) findedMember.addStarOne();
 
             return new StarResponseDto(starLike.getScore());
         }

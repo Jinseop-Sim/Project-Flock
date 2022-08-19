@@ -30,8 +30,8 @@ public class TokenProvider {
     private static final String AUTHORITIES_KEY = "auth";
     private static final String BEARER_TYPE = "bearer";
     private static final long ACCESS_TOKEN_EXIPIRE_TIME = 1000 * 60 * 15;
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 24 * 14;
-
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14;
+    private static final long KEY_TIME = 1000 * 60 * 60 * 9;
     private final Key key;
 
     public TokenProvider(@Value("${jwt.secret}") String secretKey){
@@ -66,7 +66,7 @@ public class TokenProvider {
         return MemberTokenDto.builder()
                 .grantType(BEARER_TYPE)
                 .accessToken(accessToken)
-                .accessTokenExpiresIn(accessTokenExpiresIn)
+                .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
                 .refreshToken(refreshToken)
                 .build();
     }
