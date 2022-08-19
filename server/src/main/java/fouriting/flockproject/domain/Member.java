@@ -1,7 +1,6 @@
 package fouriting.flockproject.domain;
 
 import fouriting.flockproject.domain.enumClass.Authority;
-import fouriting.flockproject.domain.enumClass.ScoreInfo;
 import fouriting.flockproject.domain.enumClass.Title;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,8 +41,8 @@ public class Member {
     private Authority authority;
 
     // Data for title
-    @Embedded
-    private ScoreInfo scoreInfo;
+    private Integer scoreOne;
+    private Integer scoreFive;
 
     @Builder
     public Member(String loginId, String nickname, String passwd) {
@@ -55,22 +54,22 @@ public class Member {
     public void updateTitle(){
         if(this.getMyComments().size() > 10)
             this.title = Title.박찬호;
-        if(this.scoreInfo.getScoreOne() > 10)
+        if(this.scoreOne > 10)
             this.title = Title.테러리스트;
-        if(this.scoreInfo.getScoreFive() > 20)
+        if(this.scoreFive > 20)
             this.title = Title.천사;
     }
 
     public void addStarOne(){
-        this.scoreInfo.setScoreOne(this.scoreInfo.getScoreOne() + 1);
+        this.scoreOne++;
     }
     public void addStarFive(){
-        this.scoreInfo.setScoreFive(this.scoreInfo.getScoreFive() + 1);
+        this.scoreFive++;
     }
     public void subStarOne(){
-        this.scoreInfo.setScoreOne(this.scoreInfo.getScoreOne() - 1);
+        this.scoreOne--;
     }
     public void subStarFive(){
-        this.scoreInfo.setScoreFive(this.scoreInfo.getScoreFive() - 1);
+        this.scoreFive--;
     }
 }

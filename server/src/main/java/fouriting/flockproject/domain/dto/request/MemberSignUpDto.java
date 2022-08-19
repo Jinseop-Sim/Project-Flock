@@ -27,6 +27,8 @@ public class MemberSignUpDto {
                 .nickname(nickname)
                 .passwd(passwordEncoder.encode(passwd))
                 .authority(Authority.ROLE_USER)
+                .scoreOne(0)
+                .scoreFive(0)
                 .title(Title.새싹)
                 .build();
     }
