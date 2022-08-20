@@ -98,8 +98,12 @@ public class WebtoonService {
             if(findedStar.get().getScore() == 5) findedMember.subStarFive();
             if(findedStar.get().getScore() == 1) findedMember.subStarOne();
 
-            findedWebtoon.subStar(abs(findedStar.get().getScore() - addStarRequestDto.getScore()));
+            if(findedStar.get().getScore() > addStarRequestDto.getScore())
+                findedWebtoon.subStar(findedStar.get().getScore() - addStarRequestDto.getScore());
+            else findedWebtoon.addStar(addStarRequestDto.getScore() - findedStar.get().getScore());
+
             findedStar.get().updateStar(addStarRequestDto.getScore());
+
             // 내가 바꾸려는 별점이 5점이나 1점이면 추가.
             if(addStarRequestDto.getScore() == 5) findedMember.addStarFive();
             if(addStarRequestDto.getScore() == 1) findedMember.addStarOne();
