@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class CommentRequestDto {
     private String contents;
+    private String createTime;
 
     public Comment sendComment(Member member, String author, Webtoon webtoon){
         return Comment.builder()
@@ -21,7 +22,7 @@ public class CommentRequestDto {
                 .webtoon(webtoon)
                 .author(author)
                 .contents(contents)
-                .postTime(LocalDateTime.now())
+                .postTime(createTime)
                 .build();
     }
 }
