@@ -10,5 +10,5 @@ import java.time.LocalDateTime;
 public class MyPageCommentInfo {
     private String name;
     private String contents;
-    private LocalDateTime createTime;
+    private String createTime;
 }
