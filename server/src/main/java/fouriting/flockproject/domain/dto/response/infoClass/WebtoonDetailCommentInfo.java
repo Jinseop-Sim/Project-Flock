@@ -10,5 +10,5 @@ import java.time.LocalDateTime;
 public class WebtoonDetailCommentInfo {
     private String name;
     private String contents;
-    private LocalDateTime createTime;
+    private String createTime;
 }

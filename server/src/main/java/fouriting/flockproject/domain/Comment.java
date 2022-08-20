@@ -24,7 +24,7 @@ public class Comment {
     @JoinColumn(name = "WEBTOON_ID")
     private Webtoon webtoon;
     private String author;
-    private LocalDateTime postTime;
+    private String postTime;
     @Lob
     private String contents;
 

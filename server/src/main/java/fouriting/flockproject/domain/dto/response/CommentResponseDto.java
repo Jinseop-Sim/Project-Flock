@@ -18,7 +18,7 @@ public class CommentResponseDto {
     private String memberName;
     private String webtoonName;
     private String contents;
-    private LocalDateTime createTime;
+    private String createTime;
 
     public CommentResponseDto sendCommentDto(Comment comment){
         return CommentResponseDto.builder()
