@@ -12,6 +12,6 @@ spring:
     generate-ddl: true
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
 jwt:
   secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWZsb2NrLXNwcmluZy1ib290LXNlY3VyaXR5LWp3dC10dXRvcmlhbC1mbG9jaw==

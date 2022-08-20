@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/webtoons")
@@ -47,8 +49,8 @@ public class WebtoonController {
             "\n Webtoon의 ID 값을 경로에 넘겨주시면 됩니다." +
             "\n ex) domain.com/webtoons/1")
     @GetMapping("/{webtoonId}")
-    public ResponseEntity<WebtoonDetailResponseDto> webtoonDetail(@PathVariable Long webtoonId){
-        return new ResponseEntity<>(webtoonService.showWebtoonDetail(webtoonId), HttpStatus.OK);
+    public ResponseEntity<WebtoonDetailResponseDto> webtoonDetail(@PathVariable Long webtoonId, HttpServletRequest request){
+        return new ResponseEntity<>(webtoonService.showWebtoonDetail(webtoonId, request), HttpStatus.OK);
     }
 
     @Operation(summary = "웹툰 별점 등록", description = "웹툰 별점 등록 컨트롤러입니다."+

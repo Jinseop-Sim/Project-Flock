@@ -6,6 +6,8 @@ import fouriting.flockproject.config.jwt.JwtSecurityConfig;
 import fouriting.flockproject.config.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,7 +15,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsUtils;
 
+@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -36,6 +41,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     protected void configure(HttpSecurity http) throws Exception{
+        http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues());
+        // CORS에 대한 허가처리
+
         http.csrf().disable()
                 // CSRF 설정 Disable
 
@@ -58,7 +66,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/auth/**", "/hello",
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/**/*").permitAll()
+                .antMatchers("/auth/**", "/hello", "/",
                         "/swagger-resources/**", "/search", "/webtoons",
                         "/webtoons/{\\d+}").permitAll()
                 .anyRequest().authenticated()

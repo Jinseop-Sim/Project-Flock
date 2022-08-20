@@ -1,8 +1,6 @@
 package fouriting.flockproject.controller;
 
-import fouriting.flockproject.domain.dto.request.WebtoonRequestDto;
 import fouriting.flockproject.domain.dto.response.MyPageResponseDto;
-import fouriting.flockproject.domain.dto.response.WebtoonSearchDto;
 import fouriting.flockproject.service.MemberService;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -44,5 +42,19 @@ public class MemberController {
     @GetMapping("/mypage")
     public ResponseEntity<MyPageResponseDto> myPage(HttpServletRequest request){
         return new ResponseEntity<>(memberService.showMyPage(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "로그아웃", description = "로그아웃 요청 Controller 입니다.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK!!"),
+            @ApiResponse(code = 400, message = "BAD REQUEST!!"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "NOT FOUND")
+    })
+    @PostMapping("/logoutcon")
+    public String logout(){
+        memberService.logout();
+        return "로그아웃이 정상적으로 처리 되었습니다.";
     }
 }

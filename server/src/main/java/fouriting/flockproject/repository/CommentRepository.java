@@ -18,4 +18,12 @@ public class CommentRepository {
     public void save(Comment comment){
         em.persist(comment);
     }
+
+    public List<Comment> findByMember(Member member){
+        List<Comment> comments = em.createQuery("SELECT c FROM Comment c join fetch c.webtoon WHERE c.member =: member", Comment.class)
+                .setParameter("member", member)
+                .getResultList();
+
+        return comments;
+    }
 }
