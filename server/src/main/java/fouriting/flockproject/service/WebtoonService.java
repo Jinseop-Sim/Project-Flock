@@ -26,6 +26,8 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import static java.lang.Math.abs;
 
 @Service
@@ -66,24 +68,28 @@ public class WebtoonService {
             Optional<StarLike> findedStar = starRepository.findByMemberId(SecurityUtil.getCurrnetMemberId(), webtoonId);
 
             if (findedStar.isPresent()) {
-                    tempStar = findedStar.get().getScore();
+                tempStar = findedStar.get().getScore();
             }
         }
-
-        List<WebtoonDetailCommentInfo> commentInfos = new ArrayList<>();
         Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
 
-        for (Comment comment : findedWebtoon.getComments()) {
-            commentInfos.add(new WebtoonDetailCommentInfo(comment.getAuthor(),
-                                                          comment.getContents(),
-                                                          comment.getPostTime()));
-        }
+        List<WebtoonDetailCommentInfo> commentInfos = findedWebtoon.getComments().stream()
+                        .map(m -> new WebtoonDetailCommentInfo(
+                                m.getAuthor(),
+                                m.getContents(),
+                                m.getPostTime()))
+                        .collect(Collectors.toList());
 
         findedWebtoon.calcStar();
 
-        return new WebtoonDetailResponseDto(findedWebtoon.getName(), findedWebtoon.getAuthor(),
-                findedWebtoon.getImage(), findedWebtoon.getGenre(),
-                findedWebtoon.getDetails(), findedWebtoon.getPlatform(), findedWebtoon.getStarAvg(),
+        return new WebtoonDetailResponseDto(
+                findedWebtoon.getName(),
+                findedWebtoon.getAuthor(),
+                findedWebtoon.getImage(),
+                findedWebtoon.getGenre(),
+                findedWebtoon.getDetails(),
+                findedWebtoon.getPlatform(),
+                findedWebtoon.getStarAvg(),
                 tempStar, commentInfos);
     }
 
@@ -126,16 +132,16 @@ public class WebtoonService {
 
     @Transactional
     public WebtoonSearchDto searchWebtoon(WebtoonRequestDto webtoonRequestDto){
-        List<WebtoonInfo> webtoonInfoList = new ArrayList<>();
         // 검색한 제목이 들어가는 웹툰 List를 받아온다.
         List<Webtoon> webtoonList = webtoonRepository.findByName(webtoonRequestDto.getName());
-        for (Webtoon webtoon : webtoonList) {
-            webtoonInfoList.add(new WebtoonInfo(
-                    webtoon.getId(),
-                    webtoon.getName(),
-                    webtoon.getAuthor(),
-                    webtoon.getImage()));
-        }
+
+        List<WebtoonInfo> webtoonInfoList = webtoonList.stream()
+                .map(m -> new WebtoonInfo(
+                        m.getId(),
+                        m.getName(),
+                        m.getAuthor(),
+                        m.getImage()))
+                .collect(Collectors.toList());
 
         return new WebtoonSearchDto(webtoonInfoList);
     }
