@@ -1,7 +1,6 @@
-# :green_book: Flock : Webtoon Recommender  
+# :green_book: Flock : Backend Repository
 - __웹툰을 평가하고 추천해주는 서비스입니다. :green_book:__
 
-## Flock Back-end
 ## :family: Team Member
 <br />
 
