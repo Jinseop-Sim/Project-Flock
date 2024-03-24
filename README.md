@@ -1,5 +1,6 @@
 # :green_book: Flock : Backend Repository
 - __웹툰을 평가하고 추천해주는 서비스입니다. :green_book:__
+- 리팩토링 진행 중입니다. (2024.03.18 ~ )
 
 ## :family: Team Member
 <br />
