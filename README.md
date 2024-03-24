@@ -14,8 +14,7 @@
 - Java Springboot
 - Maria DB (RDS)
 - AWS EC2
-
-## 📱 Wireframe
+- AWS S3
 
 ## 🧔 Responsibility
 - 회원가입 및 로그인 인증 절차 구현
