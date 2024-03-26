@@ -1,10 +1,8 @@
 package fouriting.flockproject.controller;
 
 import fouriting.flockproject.domain.dto.request.MemberLogInDto;
-import fouriting.flockproject.domain.dto.request.TokenRequestDto;
 import fouriting.flockproject.domain.dto.response.MemberResponseDto;
 import fouriting.flockproject.domain.dto.request.MemberSignUpDto;
-import fouriting.flockproject.domain.dto.response.MemberTokenDto;
 import fouriting.flockproject.service.AuthService;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -34,8 +33,8 @@ public class AuthController {
             @ApiResponse(code = 404, message = "NOT FOUND")
     })
     @PostMapping("/login")
-    public ResponseEntity<MemberTokenDto> login(@RequestBody @Valid MemberLogInDto memberLogInDto){
-        return new ResponseEntity<>(authService.logIn(memberLogInDto), HttpStatus.OK);
+    public ResponseEntity<String> login(@RequestBody @Valid MemberLogInDto memberLogInDto, HttpServletRequest request){
+        return new ResponseEntity<>(authService.login(memberLogInDto, request), HttpStatus.OK);
     }
 
     @Operation(summary = "회원가입", description = "회원가입 Post Controller 입니다." +
@@ -49,17 +48,5 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<MemberResponseDto> signup(@RequestBody @Valid MemberSignUpDto memberSignUpDto){
         return new ResponseEntity<>(authService.signUp(memberSignUpDto), HttpStatus.OK);
-    }
-
-    @Operation(summary = "토큰 재발급", description = "토큰 만료 시, 재발급 Controller 입니다.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "OK!!"),
-            @ApiResponse(code = 400, message = "BAD REQUEST!!"),
-            @ApiResponse(code = 403, message = "Forbidden"),
-            @ApiResponse(code = 404, message = "NOT FOUND")
-    })
-    @PostMapping("/reissue")
-    public ResponseEntity<MemberTokenDto> reissue(@RequestBody TokenRequestDto tokenRequestDto){
-        return new ResponseEntity<>(authService.reissue(tokenRequestDto), HttpStatus.OK);
     }
 }

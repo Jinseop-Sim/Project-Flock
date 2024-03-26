@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,18 +16,20 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Member {
 
     @Id
     @Column(name = "MEMBER_ID") @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
+    @NotBlank(message = "ID는 필수 값입니다.")
     private String loginId;
     @Column(nullable = false)
+    @NotBlank
     private String nickname;
     @Column(nullable = false)
-    private String passwd;
+    @NotBlank
+    private String password;
     @Enumerated(EnumType.STRING)
     private Title title;
 
@@ -44,11 +47,10 @@ public class Member {
     private Integer scoreOne;
     private Integer scoreFive;
 
-    @Builder
     public Member(String loginId, String nickname, String passwd) {
         this.loginId = loginId;
         this.nickname = nickname;
-        this.passwd = passwd;
+        this.password = passwd;
     }
 
     public void updateTitle(){

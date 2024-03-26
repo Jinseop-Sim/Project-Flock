@@ -14,10 +14,11 @@ public class MemberResponseDto {
     private String loginId;
     private String nickname;
 
-    public MemberResponseDto memberResponse(Member member){
-        return MemberResponseDto.builder()
-                .loginId(member.getLoginId())
-                .nickname(member.getNickname())
-                .build();
+    private MemberResponseDto(Member member){
+        this.loginId = member.getLoginId();
+        this.nickname = member.getNickname();
+    }
+    public MemberResponseDto toMember(Member member){
+        return new MemberResponseDto(member);
     }
 }
