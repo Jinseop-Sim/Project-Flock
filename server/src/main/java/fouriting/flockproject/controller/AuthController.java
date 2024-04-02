@@ -1,8 +1,8 @@
 package fouriting.flockproject.controller;
 
-import fouriting.flockproject.domain.dto.request.MemberLogInDto;
+import fouriting.flockproject.domain.dto.request.auth.MemberLogInDto;
 import fouriting.flockproject.domain.dto.response.MemberResponseDto;
-import fouriting.flockproject.domain.dto.request.MemberSignUpDto;
+import fouriting.flockproject.domain.dto.request.auth.MemberSignUpDto;
 import fouriting.flockproject.service.AuthService;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;

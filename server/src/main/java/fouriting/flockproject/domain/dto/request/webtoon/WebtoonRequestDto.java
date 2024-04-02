@@ -1,4 +1,4 @@
-package fouriting.flockproject.domain.dto.request;
+package fouriting.flockproject.domain.dto.request.webtoon;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

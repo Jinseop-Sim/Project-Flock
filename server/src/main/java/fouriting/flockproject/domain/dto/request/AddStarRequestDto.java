@@ -12,17 +12,8 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @AllArgsConstructor
-@Builder
 @NoArgsConstructor
 public class AddStarRequestDto {
     @NotNull
     Double score;
-
-    public StarLike sendStarLike(Member member, Webtoon webtoon){
-        return StarLike.builder()
-                .member(member)
-                .webtoon(webtoon)
-                .score(score)
-                .build();
-    }
 }

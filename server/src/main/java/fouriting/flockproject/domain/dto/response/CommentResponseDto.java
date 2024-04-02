@@ -12,20 +12,10 @@ import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Getter
 public class CommentResponseDto {
     private String memberName;
     private String webtoonName;
     private String contents;
     private String createTime;
-
-    public CommentResponseDto sendCommentDto(Comment comment){
-        return CommentResponseDto.builder()
-                .memberName(comment.getMember().getNickname())
-                .webtoonName(comment.getWebtoon().getName())
-                .contents(comment.getContents())
-                .createTime(comment.getPostTime())
-                .build();
-    }
 }

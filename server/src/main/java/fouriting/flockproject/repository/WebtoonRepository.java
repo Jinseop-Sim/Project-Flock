@@ -14,27 +14,26 @@ import java.util.Optional;
 public class WebtoonRepository {
     private final EntityManager em;
 
+    public List<Webtoon> findAll(){
+        return em.createQuery("SELECT w FROM Webtoon w", Webtoon.class)
+                .getResultList();
+    }
+
     public List<Webtoon> findByGenre(Genre genre){
-        List<Webtoon> webtoons = em.createQuery("SELECT w FROM Webtoon w WHERE w.genre =: genre", Webtoon.class)
+        return em.createQuery("SELECT w FROM Webtoon w WHERE w.genre =: genre", Webtoon.class)
                 .setParameter("genre", genre)
                 .getResultList();
-
-        return webtoons;
     }
 
     public List<Webtoon> findByName(String name){
-        List<Webtoon> webtoons = em.createQuery("SELECT w FROM Webtoon w WHERE w.name LIKE :name", Webtoon.class)
+        return em.createQuery("SELECT w FROM Webtoon w WHERE w.name LIKE :name", Webtoon.class)
                 .setParameter("name", "%" + name + "%")
                 .getResultList();
-
-        return webtoons;
     }
 
     public Webtoon findById(Long id){
-        Webtoon webtoons = em.createQuery("SELECT w FROM Webtoon w WHERE w.id =: id", Webtoon.class)
+        return em.createQuery("SELECT w FROM Webtoon w WHERE w.id =: id", Webtoon.class)
                 .setParameter("id", id)
                 .getSingleResult();
-
-        return webtoons;
     }
 }

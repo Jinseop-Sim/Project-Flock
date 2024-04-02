@@ -19,11 +19,22 @@ public class CommentRepository {
         em.persist(comment);
     }
 
+    public Comment findById(Long id){
+        return em.createQuery("SELECT c FROM Comment c WHERE c.id=:id", Comment.class)
+                .setParameter("id", id)
+                .getSingleResult();
+    }
+
     public List<Comment> findByMember(Member member){
-        List<Comment> comments = em.createQuery("SELECT c FROM Comment c join fetch c.webtoon WHERE c.member =: member", Comment.class)
+        return em.createQuery("SELECT c FROM Comment c join fetch c.webtoon WHERE c.member =: member", Comment.class)
                 .setParameter("member", member)
                 .getResultList();
+    }
 
-        return comments;
+    public List<Comment> findByPostId(Long postId){
+        return em.createQuery("SELECT c FROM Comment c WHERE c.webtoon.id =: postId " +
+                                      "ORDER BY c.parentComment.id ASC, c.postTime ASC ", Comment.class)
+                .setParameter("postId", postId)
+                .getResultList();
     }
 }

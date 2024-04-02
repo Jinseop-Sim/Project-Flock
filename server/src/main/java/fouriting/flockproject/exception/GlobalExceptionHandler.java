@@ -13,20 +13,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(IdDuplicateException.class)
-    public ResponseEntity<ErrorResponse> handleIdDuplicateException(IdDuplicateException ex){
-        ErrorResponse response = new ErrorResponse(ex.getErrorCode());
-        return new ResponseEntity<>(response, HttpStatus.valueOf(ex.getErrorCode().getStatus()));
+    public ResponseEntity<ErrorResponseEntity> handleIdDuplicateException(IdDuplicateException ex){
+        return ErrorResponseEntity.createResponseEntity(ex.getErrorCode());
     }
 
     @ExceptionHandler(IdNotExistException.class)
-    public ResponseEntity<ErrorResponse> handleIdNotExistException(IdNotExistException ex){
-        ErrorResponse response = new ErrorResponse(ex.getErrorCode());
-        return new ResponseEntity<>(response, HttpStatus.valueOf(ex.getErrorCode().getStatus()));
+    public ResponseEntity<ErrorResponseEntity> handleIdNotExistException(IdNotExistException ex){
+        return ErrorResponseEntity.createResponseEntity(ex.getErrorCode());
     }
 
     @ExceptionHandler(PasswdNotMatchException.class)
-    public ResponseEntity<ErrorResponse> handlePasswdNotMatchException(PasswdNotMatchException ex){
-        ErrorResponse response = new ErrorResponse(ex.getErrorCode());
-        return new ResponseEntity<>(response, HttpStatus.valueOf(ex.getErrorCode().getStatus()));
+    public ResponseEntity<ErrorResponseEntity> handlePasswdNotMatchException(PasswdNotMatchException ex){
+        return ErrorResponseEntity.createResponseEntity(ex.getErrorCode());
     }
 }

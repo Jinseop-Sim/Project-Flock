@@ -27,10 +27,9 @@ public class Webtoon {
     private Genre genre;
     private Double starAvg;
     private Double starSum;
+    private Long starCount;
 
     // Foreign Table
-    @OneToMany(mappedBy = "webtoon")
-    private List<StarLike> stars = new ArrayList<>();
     @OneToMany(mappedBy = "webtoon")
     private List<Comment> comments = new ArrayList<>();
 
@@ -42,8 +41,16 @@ public class Webtoon {
         this.starSum -= target;
     }
 
-    public void calcStar(){
+    public void pushStar(){
+        this.starCount++;
+    }
+
+    public void addComment(Comment comment){
+        this.comments.add(comment);
+    }
+
+    public void calculateStar(){
         if(this.starSum == 0) this.starAvg = 0.0;
-        else this.starAvg = starSum / stars.size();
+        else this.starAvg = starSum / starCount;
     }
 }

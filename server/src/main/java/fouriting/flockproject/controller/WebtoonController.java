@@ -1,13 +1,12 @@
 package fouriting.flockproject.controller;
 
-import fouriting.flockproject.domain.dto.request.WebtoonRequestDto;
+import fouriting.flockproject.domain.dto.request.webtoon.WebtoonRequestDto;
 import fouriting.flockproject.domain.dto.response.StarResponseDto;
+import fouriting.flockproject.domain.dto.response.WebtoonListDto;
 import fouriting.flockproject.domain.enumClass.Genre;
 import fouriting.flockproject.domain.dto.request.AddStarRequestDto;
-import fouriting.flockproject.domain.dto.request.CommentRequestDto;
-import fouriting.flockproject.domain.dto.response.CommentResponseDto;
+import fouriting.flockproject.domain.dto.request.comment.CommentRequestDto;
 import fouriting.flockproject.domain.dto.response.infoClass.WebtoonDetailResponseDto;
-import fouriting.flockproject.domain.dto.response.WebtoonSearchDto;
 import fouriting.flockproject.service.WebtoonService;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -18,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,17 +30,25 @@ public class WebtoonController {
             "\n 댓글 내용(String contents)" +
             "\n ### 이 기능은 로그인을 해야만 사용 가능합니다.")
     @PostMapping("/{webtoonId}/comment")
-    public ResponseEntity<CommentResponseDto> postComment(@PathVariable Long webtoonId,
-                                                          @RequestBody CommentRequestDto commentRequestDto){
-        return new ResponseEntity<>(webtoonService.addComment(webtoonId, commentRequestDto), HttpStatus.OK);
+    public ResponseEntity<String> postComment(@PathVariable Long webtoonId,
+                                              @RequestBody CommentRequestDto commentRequestDto,
+                                              HttpServletRequest request){
+        return new ResponseEntity<>(webtoonService.addComment(webtoonId, commentRequestDto, request), HttpStatus.OK);
+    }
+
+    @PostMapping("/{webtoonId}/comment/{commentId}")
+    public ResponseEntity<String> postChildComment(@PathVariable Long webtoonId, @PathVariable Long commentId,
+                                                   @RequestBody CommentRequestDto commentRequestDto,
+                                                   HttpServletRequest request){
+        return new ResponseEntity<>(webtoonService.addChildComment(webtoonId, commentId, commentRequestDto, request), HttpStatus.OK);
     }
 
     @Operation(summary = "웹툰 목록 조회", description = "웹툰 목록 조회 컨트롤러입니다."+
             "\n ### 요청 변수 " +
             "\n QueryParameter로 장르를 넘겨주시면 됩니다." +
             "\n ex) domain.com/webtoons?genre=개그")
-    @GetMapping()
-    public ResponseEntity<WebtoonSearchDto> webtoonList(@RequestParam Genre genre){
+    @GetMapping
+    public ResponseEntity<List<WebtoonListDto>> showWebtoonList(@RequestParam Genre genre){
         return new ResponseEntity<>(webtoonService.showWebtoonList(genre), HttpStatus.OK);
     }
 
@@ -59,8 +67,9 @@ public class WebtoonController {
             "\n ex) domain.com/webtoons/1")
     @PostMapping("/{webtoonId}/star")
     public ResponseEntity<StarResponseDto> postStarToWebtoon(@PathVariable Long webtoonId,
-                                                             @RequestBody AddStarRequestDto addStarRequestDto){
-        return new ResponseEntity<>(webtoonService.addStarToWebtoon(webtoonId, addStarRequestDto), HttpStatus.OK);
+                                                             @RequestBody AddStarRequestDto addStarRequestDto,
+                                                             HttpServletRequest request){
+        return new ResponseEntity<>(webtoonService.addStarToWebtoon(webtoonId, addStarRequestDto, request), HttpStatus.OK);
     }
 
     @Operation(summary = "검색 기능", description = "검색 기능 요청 Controller입니다."+
@@ -73,7 +82,7 @@ public class WebtoonController {
             @ApiResponse(code = 404, message = "NOT FOUND")
     })
     @PostMapping("/search")
-    public ResponseEntity<WebtoonSearchDto> searchWebtoon(@RequestBody WebtoonRequestDto webtoonRequestDto){
+    public ResponseEntity<List<WebtoonListDto>> searchWebtoon(@RequestBody WebtoonRequestDto webtoonRequestDto){
         return new ResponseEntity<>(webtoonService.searchWebtoon(webtoonRequestDto), HttpStatus.OK);
     }
 }

@@ -1,9 +1,10 @@
 package fouriting.flockproject.domain;
 
+import fouriting.flockproject.domain.dto.request.auth.MemberSignUpDto;
+import fouriting.flockproject.domain.dto.request.comment.CommentRequestDto;
 import fouriting.flockproject.domain.enumClass.Authority;
 import fouriting.flockproject.domain.enumClass.Title;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,7 +18,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member {
-
     @Id
     @Column(name = "MEMBER_ID") @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,8 +36,6 @@ public class Member {
     // Foreign Table
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> myComments = new ArrayList<>();
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StarLike> myStars = new ArrayList<>();
 
     // Spring Security
     @Enumerated(EnumType.STRING)
@@ -47,13 +45,26 @@ public class Member {
     private Integer scoreOne;
     private Integer scoreFive;
 
-    public Member(String loginId, String nickname, String passwd) {
-        this.loginId = loginId;
-        this.nickname = nickname;
+    public Member(MemberSignUpDto memberSignUpDto) {
+        this.loginId = memberSignUpDto.getLoginId();
+        this.nickname = memberSignUpDto.getNickname();
+        this.password = memberSignUpDto.getPasswd();
+        this.authority = Authority.ROLE_USER;
+        this.title = Title.새싹;
+        this.scoreFive = 0;
+        this.scoreOne = 0;
+    }
+    public static Member toMember(MemberSignUpDto memberSignUpDto){
+        return new Member(memberSignUpDto);
+    }
+
+    public void encodePassword(String passwd){
         this.password = passwd;
     }
 
-    public void updateTitle(){
+    public void updateTitle(Comment comment){
+        this.myComments.add(comment);
+
         if(this.getMyComments().size() > 10)
             this.title = Title.박찬호;
         if(this.scoreOne > 10)
