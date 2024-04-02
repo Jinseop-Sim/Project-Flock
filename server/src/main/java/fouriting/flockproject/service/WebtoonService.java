@@ -1,8 +1,9 @@
 package fouriting.flockproject.service;
 
-import fouriting.flockproject.config.SessionConstant;
 import fouriting.flockproject.domain.Comment;
 import fouriting.flockproject.domain.StarLike;
+import fouriting.flockproject.domain.dto.response.session.UserBooleanDto;
+import fouriting.flockproject.domain.dto.response.session.UserSessionDto;
 import fouriting.flockproject.domain.dto.request.webtoon.WebtoonRequestDto;
 import fouriting.flockproject.domain.dto.response.StarResponseDto;
 import fouriting.flockproject.domain.dto.response.WebtoonChildCommentDto;
@@ -18,13 +19,12 @@ import fouriting.flockproject.repository.CommentRepository;
 import fouriting.flockproject.repository.MemberRepository;
 import fouriting.flockproject.repository.StarRepository;
 import fouriting.flockproject.repository.WebtoonRepository;
-import fouriting.flockproject.utility.SessionUtil;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 @Transactional
 public class WebtoonService {
@@ -40,9 +41,8 @@ public class WebtoonService {
     private final CommentRepository commentRepository;
     private final StarRepository starRepository;
 
-    public String addComment(Long webtoonId, CommentRequestDto commentRequestDto, HttpServletRequest request){
-        String currentMemberId = SessionUtil.getCurrentMemberId(request);
-        Member findedMember = memberRepository.findByLoginId(currentMemberId).orElseThrow();
+    public String addComment(Long webtoonId, CommentRequestDto commentRequestDto, UserSessionDto userSessionDto){
+        Member findedMember = memberRepository.findByLoginId(userSessionDto.getLoginId()).orElseThrow();
         Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
 
         Comment comment = Comment.toCommentWithoutParent(commentRequestDto, findedMember, findedWebtoon);
@@ -53,9 +53,8 @@ public class WebtoonService {
         return "댓글이 성공적으로 등록되었습니다!";
     }
 
-    public String addChildComment(Long webtoonId, Long parentId, CommentRequestDto commentRequestDto, HttpServletRequest request){
-        String currentMemberId = SessionUtil.getCurrentMemberId(request);
-        Member findedMember = memberRepository.findByLoginId(currentMemberId).orElseThrow();
+    public String addChildComment(Long webtoonId, Long parentId, CommentRequestDto commentRequestDto, UserSessionDto userSessionDto){
+        Member findedMember = memberRepository.findByLoginId(userSessionDto.getLoginId()).orElseThrow();
         Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
         Comment findedComment = commentRepository.findById(parentId);
 
@@ -78,14 +77,13 @@ public class WebtoonService {
     }
 
     @Transactional(readOnly = true)
-    public WebtoonDetailResponseDto showWebtoonDetail(Long webtoonId, HttpServletRequest request){
+    public WebtoonDetailResponseDto showWebtoonDetail(Long webtoonId, UserBooleanDto userBooleanDto){
         Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
         Double currStar = findedWebtoon.getStarAvg();
 
-        HttpSession session = request.getSession(false);
-        if(session != null) {
-            String findedMember = (String) session.getAttribute(SessionConstant.LOGIN_MEMBER);
-            StarLike findedStarLike = starRepository.findByMemberIdAndWebtoonId(findedMember, webtoonId).orElse(null);
+        if(userBooleanDto.getIsLoggedIn()) {
+            Member findedMember = memberRepository.findByLoginId(userBooleanDto.getLoginId()).orElseThrow();
+            StarLike findedStarLike = starRepository.findByMemberIdAndWebtoonId(findedMember.getLoginId(), webtoonId).orElse(null);
             if(findedStarLike == null)
                 currStar = 0.0;
             else
@@ -111,9 +109,8 @@ public class WebtoonService {
     }
 
     @Transactional
-    public StarResponseDto addStarToWebtoon(Long webtoonId, AddStarRequestDto addStarRequestDto, HttpServletRequest request){
-        String currentMemberId = SessionUtil.getCurrentMemberId(request);
-        Member findedMember = memberRepository.findByLoginId(currentMemberId).get();
+    public StarResponseDto addStarToWebtoon(Long webtoonId, AddStarRequestDto addStarRequestDto, UserSessionDto userSessionDto){
+        Member findedMember = memberRepository.findByLoginId(userSessionDto.getLoginId()).orElseThrow();
         Optional<StarLike> findedStar = starRepository.findByMemberIdAndWebtoonId(findedMember.getLoginId(), webtoonId);
 
         if(findedStar.isPresent()) { // 이 때는, 이미 별점을 표시하고 업데이트 할 때.
@@ -136,12 +133,13 @@ public class WebtoonService {
             Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
             StarLike starLike = StarLike.toStarLike(addStarRequestDto, findedMember, findedWebtoon);
             findedWebtoon.addStar(addStarRequestDto.getScore());
+            findedWebtoon.pushStar(); // 누른 사람 1명 추가
             findedWebtoon.calculateStar(); // 여기서 계산 해야됨
-            starRepository.save(starLike);
-            // 내가 바꾸려는 별점이 5점이나 1점이면 추가.
             if(addStarRequestDto.getScore() == 5) findedMember.addStarFive();
             if(addStarRequestDto.getScore() == 1) findedMember.addStarOne();
-            findedWebtoon.pushStar(); // 누른 사람 1명 추가
+
+            starRepository.save(starLike);
+            // 내가 바꾸려는 별점이 5점이나 1점이면 추가.
 
             return new StarResponseDto(starLike.getScore());
         }

@@ -1,5 +1,6 @@
 package fouriting.flockproject.controller;
 
+import fouriting.flockproject.domain.dto.response.session.UserSessionDto;
 import fouriting.flockproject.domain.dto.response.MyPageResponseDto;
 import fouriting.flockproject.service.MemberService;
 import io.swagger.annotations.ApiResponse;
@@ -10,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,8 +28,8 @@ public class MemberController {
             @ApiResponse(code = 404, message = "NOT FOUND")
     })
     @GetMapping("/mypage")
-    public ResponseEntity<MyPageResponseDto> myPage(HttpServletRequest request){
-        return new ResponseEntity<>(memberService.showMyPage(request), HttpStatus.OK);
+    public ResponseEntity<MyPageResponseDto> myPage(UserSessionDto userSessionDto){
+        return new ResponseEntity<>(memberService.showMyPage(userSessionDto), HttpStatus.OK);
     }
 
     @Operation(summary = "로그아웃", description = "로그아웃 요청 Controller 입니다.")
@@ -40,8 +41,7 @@ public class MemberController {
             @ApiResponse(code = 404, message = "NOT FOUND")
     })
     @PostMapping("/logout")
-    public String logout(HttpServletRequest request){
-        memberService.logout(request);
-        return "로그아웃이 정상적으로 처리 되었습니다.";
+    public ResponseEntity<String> logout(HttpSession session){
+        return new ResponseEntity<>(memberService.logout(session), HttpStatus.OK);
     }
 }
