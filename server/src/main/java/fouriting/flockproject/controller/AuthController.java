@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @RestController
@@ -33,8 +34,8 @@ public class AuthController {
             @ApiResponse(code = 404, message = "NOT FOUND")
     })
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid MemberLogInDto memberLogInDto, HttpServletRequest request){
-        return new ResponseEntity<>(authService.login(memberLogInDto, request), HttpStatus.OK);
+    public ResponseEntity<String> login(@RequestBody @Valid MemberLogInDto memberLogInDto, HttpSession httpSession){
+        return new ResponseEntity<>(authService.login(memberLogInDto, httpSession), HttpStatus.OK);
     }
 
     @Operation(summary = "회원가입", description = "회원가입 Post Controller 입니다." +

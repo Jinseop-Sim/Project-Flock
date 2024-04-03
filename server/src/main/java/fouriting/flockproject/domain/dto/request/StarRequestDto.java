@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddStarRequestDto {
+public class StarRequestDto {
     @NotNull
     Double score;
 }

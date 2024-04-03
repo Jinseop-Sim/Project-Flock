@@ -1,12 +1,12 @@
 package fouriting.flockproject.controller;
 
+import fouriting.flockproject.domain.dto.request.StarRequestDto;
 import fouriting.flockproject.domain.dto.response.session.UserBooleanDto;
 import fouriting.flockproject.domain.dto.response.session.UserSessionDto;
 import fouriting.flockproject.domain.dto.request.webtoon.WebtoonRequestDto;
 import fouriting.flockproject.domain.dto.response.StarResponseDto;
 import fouriting.flockproject.domain.dto.response.WebtoonListDto;
 import fouriting.flockproject.domain.enumClass.Genre;
-import fouriting.flockproject.domain.dto.request.AddStarRequestDto;
 import fouriting.flockproject.domain.dto.request.comment.CommentRequestDto;
 import fouriting.flockproject.domain.dto.response.infoClass.WebtoonDetailResponseDto;
 import fouriting.flockproject.service.WebtoonService;
@@ -65,11 +65,22 @@ public class WebtoonController {
             "\n ### 요청 변수 " +
             "\n Webtoon의 ID 값을 경로에 넘기고, 별점 값이 JSON 형태로 넘어와야 합니다." +
             "\n ex) domain.com/webtoons/1")
-    @PostMapping("/{webtoonId}/star")
-    public ResponseEntity<StarResponseDto> postStarToWebtoon(@PathVariable Long webtoonId,
-                                                             @RequestBody AddStarRequestDto addStarRequestDto,
+    @PostMapping("/{webtoonId}/pushStar")
+    public ResponseEntity<StarResponseDto> pushStar(@PathVariable Long webtoonId,
+                                                             @RequestBody StarRequestDto starRequestDto,
                                                              UserSessionDto userSessionDto){
-        return new ResponseEntity<>(webtoonService.addStarToWebtoon(webtoonId, addStarRequestDto, userSessionDto), HttpStatus.OK);
+        return new ResponseEntity<>(webtoonService.addStarToWebtoon(webtoonId, starRequestDto, userSessionDto), HttpStatus.OK);
+    }
+
+    @Operation(summary = "웹툰 별점 등록", description = "웹툰 별점 등록 컨트롤러입니다."+
+            "\n ### 요청 변수 " +
+            "\n Webtoon의 ID 값을 경로에 넘기고, 별점 값이 JSON 형태로 넘어와야 합니다." +
+            "\n ex) domain.com/webtoons/1")
+    @PostMapping("/{webtoonId}/updateStar")
+    public ResponseEntity<StarResponseDto> updateStar(@PathVariable Long webtoonId,
+                                                    @RequestBody StarRequestDto starRequestDto,
+                                                    UserSessionDto userSessionDto){
+        return new ResponseEntity<>(webtoonService.updateStarToWebtoon(webtoonId, starRequestDto, userSessionDto), HttpStatus.OK);
     }
 
     @Operation(summary = "검색 기능", description = "검색 기능 요청 Controller입니다."+

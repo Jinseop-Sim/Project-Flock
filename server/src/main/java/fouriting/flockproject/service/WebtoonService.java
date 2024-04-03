@@ -2,6 +2,7 @@ package fouriting.flockproject.service;
 
 import fouriting.flockproject.domain.Comment;
 import fouriting.flockproject.domain.StarLike;
+import fouriting.flockproject.domain.dto.request.StarRequestDto;
 import fouriting.flockproject.domain.dto.response.session.UserBooleanDto;
 import fouriting.flockproject.domain.dto.response.session.UserSessionDto;
 import fouriting.flockproject.domain.dto.request.webtoon.WebtoonRequestDto;
@@ -11,10 +12,10 @@ import fouriting.flockproject.domain.dto.response.WebtoonListDto;
 import fouriting.flockproject.domain.enumClass.Genre;
 import fouriting.flockproject.domain.Member;
 import fouriting.flockproject.domain.Webtoon;
-import fouriting.flockproject.domain.dto.request.AddStarRequestDto;
 import fouriting.flockproject.domain.dto.request.comment.CommentRequestDto;
 import fouriting.flockproject.domain.dto.response.infoClass.WebtoonDetailCommentInfo;
 import fouriting.flockproject.domain.dto.response.infoClass.WebtoonDetailResponseDto;
+import fouriting.flockproject.domain.enumClass.StarCalculator;
 import fouriting.flockproject.repository.CommentRepository;
 import fouriting.flockproject.repository.MemberRepository;
 import fouriting.flockproject.repository.StarRepository;
@@ -24,11 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,7 +47,7 @@ public class WebtoonService {
         Comment comment = Comment.toCommentWithoutParent(commentRequestDto, findedMember, findedWebtoon);
         commentRepository.save(comment);
         findedWebtoon.addComment(comment);
-        findedMember.updateTitle(comment);
+        findedMember.addComment(comment);
 
         return "댓글이 성공적으로 등록되었습니다!";
     }
@@ -61,7 +60,7 @@ public class WebtoonService {
         Comment newComment = Comment.toCommentWithParent(commentRequestDto, findedMember, findedWebtoon, findedComment);
         commentRepository.save(newComment);
         findedComment.addChildComment(newComment);
-        findedMember.updateTitle(newComment);
+        findedMember.addComment(newComment);
 
         return "대댓글이 성공적으로 등록되었습니다!";
     }
@@ -109,42 +108,42 @@ public class WebtoonService {
     }
 
     @Transactional
-    public StarResponseDto addStarToWebtoon(Long webtoonId, AddStarRequestDto addStarRequestDto, UserSessionDto userSessionDto){
+    public StarResponseDto addStarToWebtoon(Long webtoonId, StarRequestDto starRequestDto, UserSessionDto userSessionDto){
         Member findedMember = memberRepository.findByLoginId(userSessionDto.getLoginId()).orElseThrow();
-        Optional<StarLike> findedStar = starRepository.findByMemberIdAndWebtoonId(findedMember.getLoginId(), webtoonId);
+        StarLike findedStar = starRepository.findByMemberIdAndWebtoonId(findedMember.getLoginId(), webtoonId).orElseThrow();
+        Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
 
-        if(findedStar.isPresent()) { // 이 때는, 이미 별점을 표시하고 업데이트 할 때.
-            Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
-            // 내가 표시했던 별점이 5점이나 1점이면 빼야함.
-            if(findedStar.get().getScore() == 5) findedMember.subStarFive();
-            if(findedStar.get().getScore() == 1) findedMember.subStarOne();
+        Double targetScore = starRequestDto.getScore();
+        // 내가 표시했던 별점이 5점이나 1점이면 빼야함.
+        StarLike starLike = StarLike.toStarLike(starRequestDto, findedMember, findedWebtoon);
+        findedWebtoon.updateStar(targetScore);
+        findedWebtoon.pushStar(); // 누른 사람 1명 추가
 
-            if(findedStar.get().getScore() > addStarRequestDto.getScore())
-                findedWebtoon.subStar(findedStar.get().getScore() - addStarRequestDto.getScore());
-            else findedWebtoon.addStar(addStarRequestDto.getScore() - findedStar.get().getScore());
-            // 이 부분에서 웹툰에 이미 등록된 점수를 빼고 더한다.
-            findedStar.get().updateStar(addStarRequestDto.getScore());
+        findedMember.updateStar(targetScore);
 
-            // 내가 바꾸려는 별점이 5점이나 1점이면 추가.
-            if(addStarRequestDto.getScore() == 5) findedMember.addStarFive();
-            if(addStarRequestDto.getScore() == 1) findedMember.addStarOne();
-        }
-        else { // 아직 별점을 등록을 안했을 때
-            Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
-            StarLike starLike = StarLike.toStarLike(addStarRequestDto, findedMember, findedWebtoon);
-            findedWebtoon.addStar(addStarRequestDto.getScore());
-            findedWebtoon.pushStar(); // 누른 사람 1명 추가
-            findedWebtoon.calculateStar(); // 여기서 계산 해야됨
-            if(addStarRequestDto.getScore() == 5) findedMember.addStarFive();
-            if(addStarRequestDto.getScore() == 1) findedMember.addStarOne();
+        starRepository.save(starLike);
 
-            starRepository.save(starLike);
-            // 내가 바꾸려는 별점이 5점이나 1점이면 추가.
 
-            return new StarResponseDto(starLike.getScore());
-        }
+        return new StarResponseDto(findedStar.getScore());
+    }
 
-        return new StarResponseDto(findedStar.get().getScore());
+    @Transactional
+    public StarResponseDto updateStarToWebtoon(Long webtoonId, StarRequestDto starRequestDto, UserSessionDto userSessionDto){
+        Member findedMember = memberRepository.findByLoginId(userSessionDto.getLoginId()).orElseThrow();
+        StarLike findedStar = starRepository.findByMemberIdAndWebtoonId(findedMember.getLoginId(), webtoonId).orElseThrow();
+        Webtoon findedWebtoon = webtoonRepository.findById(webtoonId);
+
+        Double currScore = findedStar.getScore();
+        Double targetScore = starRequestDto.getScore();
+
+        findedMember.updateStar(StarCalculator.MAKE_NEGATIVE.calculate(currScore, -1.0));
+        findedWebtoon.updateStar(StarCalculator.CALCULATE_DIFFERENCE.calculate(currScore, targetScore));
+        findedStar.updateStar(targetScore);
+
+        // 내가 바꾸려는 별점이 5점이나 1점이면 추가.
+        findedMember.updateStar(targetScore);
+
+        return new StarResponseDto(currScore);
     }
 
     @Transactional(readOnly = true)

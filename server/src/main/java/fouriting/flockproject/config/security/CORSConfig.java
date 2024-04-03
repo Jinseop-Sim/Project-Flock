@@ -1,4 +1,4 @@
-package fouriting.flockproject.config;
+package fouriting.flockproject.config.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

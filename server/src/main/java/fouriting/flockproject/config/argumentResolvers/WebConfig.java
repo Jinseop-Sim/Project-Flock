@@ -1,4 +1,4 @@
-package fouriting.flockproject.config;
+package fouriting.flockproject.config.argumentResolvers;
 
 import fouriting.flockproject.config.argumentResolvers.UserArgumentResolver;
 import fouriting.flockproject.config.argumentResolvers.UserBooleanArgumentResolver;

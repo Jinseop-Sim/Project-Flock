@@ -33,9 +33,8 @@ public class AuthService {
         return new MemberResponseDto().toMember(memberRepository.save(member));
     }
 
-    public String login(MemberLogInDto memberLogInDto, HttpServletRequest request){
-        HttpSession currSession = request.getSession();
-        currSession.setAttribute(SessionConstant.LOGIN_MEMBER, memberLogInDto.getLoginId());
+    public String login(MemberLogInDto memberLogInDto, HttpSession httpSession){
+        httpSession.setAttribute(SessionConstant.LOGIN_MEMBER, memberLogInDto.getLoginId());
         return "성공적으로 로그인 되었습니다.";
     }
 }

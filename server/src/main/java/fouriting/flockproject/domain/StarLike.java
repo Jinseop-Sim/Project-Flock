@@ -1,6 +1,6 @@
 package fouriting.flockproject.domain;
 
-import fouriting.flockproject.domain.dto.request.AddStarRequestDto;
+import fouriting.flockproject.domain.dto.request.StarRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,13 +30,13 @@ public class StarLike {
         this.score = score;
     }
 
-    private StarLike(AddStarRequestDto addStarRequestDto, Member member, Webtoon webtoon){
+    private StarLike(StarRequestDto starRequestDto, Member member, Webtoon webtoon){
         this.member = member;
         this.webtoon = webtoon;
-        this.score = addStarRequestDto.getScore();
+        this.score = starRequestDto.getScore();
     }
 
-    public static StarLike toStarLike(AddStarRequestDto addStarRequestDto, Member member, Webtoon webtoon){
-        return new StarLike(addStarRequestDto, member, webtoon);
+    public static StarLike toStarLike(StarRequestDto starRequestDto, Member member, Webtoon webtoon){
+        return new StarLike(starRequestDto, member, webtoon);
     }
 }

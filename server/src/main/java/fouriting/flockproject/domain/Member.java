@@ -1,7 +1,6 @@
 package fouriting.flockproject.domain;
 
 import fouriting.flockproject.domain.dto.request.auth.MemberSignUpDto;
-import fouriting.flockproject.domain.dto.request.comment.CommentRequestDto;
 import fouriting.flockproject.domain.enumClass.Authority;
 import fouriting.flockproject.domain.enumClass.Title;
 import lombok.AllArgsConstructor;
@@ -54,6 +53,18 @@ public class Member {
         this.scoreFive = 0;
         this.scoreOne = 0;
     }
+
+    public Member(Long id, String loginId, String password, String nickname){
+        this.id = id;
+        this.loginId = loginId;
+        this.password = password;
+        this.nickname = nickname;
+        this.title = Title.새싹;
+        this.authority = Authority.ROLE_USER;
+        this.scoreOne = 0;
+        this.scoreFive = 0;
+    }
+
     public static Member toMember(MemberSignUpDto memberSignUpDto){
         return new Member(memberSignUpDto);
     }
@@ -62,9 +73,12 @@ public class Member {
         this.password = passwd;
     }
 
-    public void updateTitle(Comment comment){
+    public void addComment(Comment comment){
         this.myComments.add(comment);
+        updateTitle();
+    }
 
+    public void updateTitle(){
         if(this.getMyComments().size() > 10)
             this.title = Title.박찬호;
         if(this.scoreOne > 10)
@@ -73,16 +87,14 @@ public class Member {
             this.title = Title.천사;
     }
 
-    public void addStarOne(){
-        this.scoreOne++;
-    }
-    public void addStarFive(){
-        this.scoreFive++;
-    }
-    public void subStarOne(){
-        this.scoreOne--;
-    }
-    public void subStarFive(){
-        this.scoreFive--;
+    public void updateStar(Double target){
+        if(target == 1.0)
+            this.scoreOne++;
+        if(target == -1.0)
+            this.scoreOne--;
+        if(target == 5.0)
+            this.scoreFive++;
+        if(target == -5.0)
+            this.scoreFive--;
     }
 }

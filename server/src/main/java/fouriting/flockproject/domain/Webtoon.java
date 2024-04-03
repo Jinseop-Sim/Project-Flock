@@ -33,14 +33,23 @@ public class Webtoon {
     @OneToMany(mappedBy = "webtoon")
     private List<Comment> comments = new ArrayList<>();
 
-    public void addStar(Double score){
+    public Webtoon(Long id, String name, String author, String image, String details, Platform platform, Genre genre){
+        this.id = id;
+        this.name = name;
+        this.author = author;
+        this.image = image;
+        this.details = details;
+        this.platform = platform;
+        this.genre = genre;
+        this.starAvg = 0.0;
+        this.starSum = 0.0;
+        this.starCount = 0L;
+    }
+
+    public void updateStar(Double score){
         this.starSum += score;
+        calculateStar();
     }
-
-    public void subStar(Double target){
-        this.starSum -= target;
-    }
-
     public void pushStar(){
         this.starCount++;
     }
