@@ -19,8 +19,8 @@
 
 ## 🧔 Responsibility
 - 회원가입 및 로그인 인증 절차 구현
-  - Spring Security 및 JWT 사용
-  - Redis 사용
+  - Session 사용
+  - ArgumentResolver 이용해서 리팩토링
 - 웹툰 목록 전송
   - 장르별 정렬 기능 구현
 - 웹툰 상세 페이지 데이터 전송
